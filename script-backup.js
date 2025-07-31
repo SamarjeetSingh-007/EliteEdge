@@ -83,35 +83,31 @@
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
 
-if (hamburger && navMenu) {
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
-    });
+hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+});
 
-    // Close mobile menu when clicking on links
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-        });
+// Close mobile menu when clicking on links
+document.querySelectorAll('.nav-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navMenu.classList.remove('active');
     });
-}
+});
 
 // Enhanced Modern JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     // Navbar scroll effect
     const navbar = document.querySelector('.navbar');
     
-    if (navbar) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-    }
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
 
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -131,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const techCards = document.querySelectorAll('.tech-card');
     techCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
+            // Add gentle rotation and scale
             this.style.transform = 'translateY(-10px) scale(1.1) rotate(2deg)';
             
             // Create ripple effect
@@ -160,18 +157,77 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = '';
         });
 
+        // Add click interaction
         card.addEventListener('click', function() {
+            // Pulse effect on click
             this.style.animation = 'none';
             setTimeout(() => {
                 this.style.animation = '';
             }, 10);
             
+            // Brief scale animation
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = '';
             }, 150);
         });
     });
+
+    // Parallax effect for floating shapes
+    const shapes = document.querySelectorAll('.floating-shape');
+    
+    window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.5;
+        
+        shapes.forEach((shape, index) => {
+            const speed = (index + 1) * 0.3;
+            shape.style.transform = `translateY(${rate * speed}px) rotate(${scrolled * 0.1}deg)`;
+        });
+    });
+
+    // Central orb interaction
+    const orbCore = document.querySelector('.orb-core');
+    if (orbCore) {
+        orbCore.addEventListener('mouseenter', function() {
+            this.style.animation = 'pulse-glow 1s ease-in-out infinite';
+            this.style.transform = 'translate(-50%, -50%) scale(1.2)';
+        });
+
+        orbCore.addEventListener('mouseleave', function() {
+            this.style.animation = 'pulse-glow 3s ease-in-out infinite';
+            this.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+    }
+
+    // Dynamic connection lines animation
+    const connectionLines = document.querySelectorAll('.connection-line');
+    
+    // Animate connection lines based on mouse position
+    document.addEventListener('mousemove', function(e) {
+        const mouseX = e.clientX / window.innerWidth;
+        const mouseY = e.clientY / window.innerHeight;
+        
+        connectionLines.forEach((line, index) => {
+            const intensity = (mouseX + mouseY) * 0.5;
+            line.style.strokeOpacity = 0.3 + (intensity * 0.4);
+            line.style.strokeWidth = 1 + (intensity * 2);
+        });
+    });
+
+    // Scroll indicator functionality
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    if (scrollIndicator) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 100) {
+                scrollIndicator.style.opacity = '0';
+                scrollIndicator.style.transform = 'translateY(20px)';
+            } else {
+                scrollIndicator.style.opacity = '1';
+                scrollIndicator.style.transform = 'translateY(0)';
+            }
+        });
+    }
 
     // Enhanced button interactions
     const buttons = document.querySelectorAll('.btn');
@@ -182,6 +238,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         btn.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
+        });
+
+        btn.addEventListener('mousedown', function() {
+            this.style.transform = 'translateY(-1px) scale(1.02)';
+        });
+
+        btn.addEventListener('mouseup', function() {
+            this.style.transform = 'translateY(-3px) scale(1.05)';
         });
     });
 
@@ -208,6 +272,38 @@ document.addEventListener('DOMContentLoaded', function() {
         el.style.transition = 'all 0.6s ease';
         observer.observe(el);
     });
+
+    // Mobile navbar toggle enhancement
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+    
+    if (navbarToggler) {
+        navbarToggler.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    }
+
+    // Close mobile menu when clicking on links
+    document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (navbarCollapse.classList.contains('show')) {
+                navbarToggler.click();
+            }
+        });
+    });
+
+    // Performance optimization: Throttle scroll events
+    let scrollTimer = null;
+    const throttledScroll = function() {
+        if (scrollTimer !== null) {
+            clearTimeout(scrollTimer);
+        }
+        scrollTimer = setTimeout(function() {
+            // Scroll-dependent animations go here
+        }, 10);
+    };
+
+    window.addEventListener('scroll', throttledScroll);
 });
 
 // Add ripple animation styles
@@ -221,6 +317,67 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Enhanced parallax effect for hero section
+const hero = document.querySelector('.hero');
+const heroGraphic = document.querySelector('.hero-graphic');
+
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const rate = scrolled * -0.3;
+    
+    if (heroGraphic && scrolled < window.innerHeight) {
+        heroGraphic.style.transform = `translateY(${rate}px) rotate(${scrolled * 0.05}deg)`;
+    }
+});
+
+// Interactive tech cards with mouse tracking
+const techCards = document.querySelectorAll('.tech-card');
+techCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        
+        card.style.transform = `perspective(1000px) rotateX(${y / 10}deg) rotateY(${x / 10}deg) translateZ(20px)`;
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+    });
+});
+
+// Smooth reveal animation for hero elements
+window.addEventListener('load', () => {
+    const heroElements = document.querySelectorAll('.hero-badge, .hero-title, .hero-subtitle, .hero-stats, .hero-buttons');
+    
+    heroElements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        
+        setTimeout(() => {
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, 200 + (index * 200));
+    });
+});
+
+// Add magnetic effect to buttons
+const buttons = document.querySelectorAll('.btn-primary, .btn-secondary');
+buttons.forEach(button => {
+    button.addEventListener('mousemove', (e) => {
+        const rect = button.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        
+        button.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+    });
+    
+    button.addEventListener('mouseleave', () => {
+        button.style.transform = 'translate(0, 0)';
+    });
+});
 
 // Contact form handling
 const contactForm = document.getElementById('contactForm');
@@ -332,31 +489,182 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-// Load dynamic projects from Firebase or admin panel
-let isLoadingProjects = false;
-let projectsLoaded = false;
+// Add floating animation to hero cards with mouse interaction
+const floatingCards = document.querySelectorAll('.floating-card');
+floatingCards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-10px) scale(1.05)';
+        card.style.transition = 'all 0.3s ease';
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0) scale(1)';
+    });
+});
 
+// Add loading animation
+window.addEventListener('load', () => {
+    const loader = document.createElement('div');
+    loader.id = 'loader';
+    loader.innerHTML = `
+        <div class="loader-content">
+            <div class="loader-logo">
+                <img src="assets/Minimalist_Logo_for_EliteEdge-removebg-preview.png" alt="EliteEdge" class="loader-logo-img">
+                EliteEdge
+            </div>
+            <div class="loader-spinner"></div>
+        </div>
+    `;
+    
+    loader.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #0f0f23;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+    `;
+    
+    const loaderContent = loader.querySelector('.loader-content');
+    loaderContent.style.cssText = `
+        text-align: center;
+    `;
+    
+    const loaderLogo = loader.querySelector('.loader-logo');
+    loaderLogo.style.cssText = `
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    `;
+    
+    const loaderLogoImg = loader.querySelector('.loader-logo-img');
+    loaderLogoImg.style.cssText = `
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.5));
+        animation: pulse 2s ease-in-out infinite;
+    `;
+    
+    const loaderSpinner = loader.querySelector('.loader-spinner');
+    loaderSpinner.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(99, 102, 241, 0.3);
+        border-top: 3px solid #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    `;
+    
+    // Add spinner and pulse animations
+    const spinStyle = document.createElement('style');
+    spinStyle.textContent = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.5)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(99, 102, 241, 0.8)); }
+        }
+    `;
+    document.head.appendChild(spinStyle);
+    
+    document.body.appendChild(loader);
+    
+    // Remove loader after a short delay
+    setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+            loader.remove();
+            spinStyle.remove();
+        }, 500);
+    }, 1500);
+});
+
+// Add particle background effect
+function createParticles() {
+    const particlesContainer = document.createElement('div');
+    particlesContainer.className = 'particles-container';
+    particlesContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    `;
+    
+    document.body.appendChild(particlesContainer);
+    
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.cssText = `
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 50%;
+            animation: float-particle ${5 + Math.random() * 10}s linear infinite;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            animation-delay: ${Math.random() * 10}s;
+        `;
+        particlesContainer.appendChild(particle);
+    }
+    
+    // Add particle animation
+    const particleStyle = document.createElement('style');
+    particleStyle.textContent = `
+        @keyframes float-particle {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(particleStyle);
+}
+
+// Initialize particles
+createParticles();
+
+// Load dynamic projects from Firebase or admin panel
 async function loadDynamicProjects() {
-    // Prevent multiple simultaneous loads
-    if (isLoadingProjects) {
-        console.log('⏳ Projects already loading, skipping...');
-        return;
-    }
-    
-    // If projects are already loaded and we're not forcing a reload, skip
-    if (projectsLoaded && !window.forceReload) {
-        console.log('✅ Projects already loaded, skipping...');
-        return;
-    }
-    
-    isLoadingProjects = true;
     console.log('🔍 Starting loadDynamicProjects function');
     
     // Wait for DOM elements if they're not ready yet
     const projectsGrid = document.getElementById('projectsGrid');
     if (!projectsGrid) {
         console.log('⏳ DOM not ready yet, retrying in 100ms...');
-        isLoadingProjects = false;
         setTimeout(loadDynamicProjects, 100);
         return;
     }
@@ -417,8 +725,45 @@ async function loadDynamicProjects() {
     
     console.log('📦 Final projects to display:', projects);
     console.log('📊 Number of projects:', projects.length);
+        } else {
+            projects = websiteProjects;
+        }
+    }
+    
+    // SYNC LOGIC: Check if we need to sync admin projects to website projects
+    const adminProjects = JSON.parse(localStorage.getItem('eliteedge_projects') || '[]');
+    let projects = JSON.parse(localStorage.getItem('website_projects') || '[]');
+    
+    console.log('� Current state:');
+    console.log('  - Admin projects:', adminProjects.length);
+    console.log('  - Website projects:', projects.length);
+    
+    // If we have admin projects but no website projects, sync them
+    if (adminProjects.length > 0 && projects.length === 0) {
+        console.log('🔄 Syncing admin projects to website projects...');
+        
+        projects = adminProjects.map(project => ({
+            title: project.title,
+            description: project.description,
+            image: project.image,
+            projectLink: project.projectLink,
+            githubLink: project.githubLink,
+            technologies: project.technologies ? project.technologies.split(',').map(t => t.trim()) : [],
+            category: project.category
+        }));
+        
+        localStorage.setItem('website_projects', JSON.stringify(projects));
+        console.log('✅ Projects synced successfully!');
+    }
+    
+    console.log('📦 Final projects to display:', projects);
+    console.log('📊 Number of projects:', projects.length);
     
     const noProjectsMessage = document.getElementById('noProjectsMessage');
+    
+    console.log('🎯 DOM elements found:');
+    console.log('  - projectsGrid:', projectsGrid ? 'Found' : 'NOT FOUND');
+    console.log('  - noProjectsMessage:', noProjectsMessage ? 'Found' : 'NOT FOUND');
     
     if (projects.length === 0) {
         console.log('📝 No projects found, showing placeholder message');
@@ -435,10 +780,6 @@ async function loadDynamicProjects() {
                 </div>
             `;
         }
-        
-        // Mark loading as complete even when no projects
-        isLoadingProjects = false;
-        projectsLoaded = true;
         return;
     }
     
@@ -448,9 +789,8 @@ async function loadDynamicProjects() {
     const projectsHTML = projects.map((project, index) => {
         console.log(`🎨 Processing project ${index + 1}:`, project.title);
         return `
-        <div class="project-card" data-category="${project.category || 'WEB DEVELOPMENT'}">
-            <div class="project-image">
-                <img src="${project.image}" alt="${project.title}">
+        <div class="project-card" data-category="${project.category}">
+            <div class="project-image" style="background-image: url('${project.image}');">
                 <div class="project-overlay">
                     <div class="project-links">
                         ${project.projectLink ? `<a href="${project.projectLink}" target="_blank" class="project-link" title="View Live"><i class="fas fa-external-link-alt"></i></a>` : ''}
@@ -459,7 +799,6 @@ async function loadDynamicProjects() {
                 </div>
             </div>
             <div class="project-content">
-                <div class="project-category">${project.category || 'WEB DEVELOPMENT'}</div>
                 <h3>${project.title}</h3>
                 <p>${project.description}</p>
                 <div class="project-tech">
@@ -504,51 +843,151 @@ async function loadDynamicProjects() {
     });
     
     console.log('🎉 Project loading completed successfully!');
+}
+
+// Auto-execute debug functionality on page load
+function autoLoadProjects() {
+    console.log('🔄 Auto-loading projects (like debug button)...');
     
-    // Mark loading as complete
-    isLoadingProjects = false;
-    projectsLoaded = true;
+    // Get both admin and website projects
+    const adminProjects = JSON.parse(localStorage.getItem('eliteedge_projects') || '[]');
+    const websiteProjects = JSON.parse(localStorage.getItem('website_projects') || '[]');
     
-    // Set up real-time listener for future updates
-    if (typeof FirebaseDB !== 'undefined' && !window.firebaseListenerSet) {
-        console.log('🔥 Setting up Firebase real-time listener...');
-        FirebaseDB.onProjectsUpdate((updatedProjects) => {
-            console.log('🔄 Real-time update received:', updatedProjects.length, 'projects');
-            // Force reload projects when Firebase data changes
-            window.forceReload = true;
-            loadDynamicProjects();
-            window.forceReload = false;
-        });
-        window.firebaseListenerSet = true;
+    console.log('📊 Storage Analysis:');
+    console.log('  - Admin projects (eliteedge_projects):', adminProjects.length, adminProjects);
+    console.log('  - Website projects (website_projects):', websiteProjects.length, websiteProjects);
+    
+    // If we have admin projects but no website projects, sync them
+    if (adminProjects.length > 0 && websiteProjects.length === 0) {
+        console.log('� Syncing admin projects to website projects...');
+        
+        const syncedProjects = adminProjects.map(project => ({
+            title: project.title,
+            description: project.description,
+            image: project.image,
+            projectLink: project.projectLink,
+            githubLink: project.githubLink,
+            technologies: project.technologies ? project.technologies.split(',').map(t => t.trim()) : [],
+            category: project.category
+        }));
+        
+        localStorage.setItem('website_projects', JSON.stringify(syncedProjects));
+        console.log('✅ Projects synced successfully!');
     }
+    
+    // Force load projects
+    loadDynamicProjects();
 }
 
 // Load projects on page load and DOM ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM Content Loaded - initiating single project load');
+    console.log('🚀 DOM Content Loaded - auto-loading projects');
     
-    // Single load attempt with small delay to ensure DOM is ready
+    // Run auto-load immediately
     setTimeout(() => {
-        console.log('📝 Loading projects...');
-        loadDynamicProjects();
-    }, 300);
+        console.log('📝 Auto-load attempt (500ms delay)');
+        autoLoadProjects();
+    }, 500);
+    
+    // Backup attempts
+    setTimeout(() => {
+        console.log('📝 Backup attempt (1500ms delay)');
+        autoLoadProjects();
+    }, 1500);
+    
+    setTimeout(() => {
+        console.log('📝 Final attempt (3000ms delay)');
+        autoLoadProjects();
+    }, 3000);
+});
+
+// Also try when window is fully loaded
+window.addEventListener('load', function() {
+    console.log('🏁 Window fully loaded - auto-loading projects');
+    setTimeout(() => {
+        autoLoadProjects();
+    }, 100);
+});
+
+// Try again when page becomes visible (in case of tab switching)
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        console.log('👁️ Page became visible - auto-loading projects');
+        autoLoadProjects();
+    }
 });
 
 // Listen for storage changes (when admin adds new projects)
 window.addEventListener('storage', function(e) {
-    if (e.key === 'website_projects' || e.key === 'eliteedge_projects') {
-        console.log('📦 Storage changed, reloading projects');
-        window.forceReload = true;
+    if (e.key === 'website_projects') {
+        console.log('Storage changed, reloading projects'); // Debug log
         loadDynamicProjects();
-        window.forceReload = false;
+    }
+});
+
+// Listen for cross-tab communication from admin panel
+window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'PROJECTS_UPDATED') {
+        console.log('Received projects update from admin panel'); // Debug log
+        loadDynamicProjects();
     }
 });
 
 // Manual refresh function (for testing)
-window.refreshProjects = () => {
-    window.forceReload = true;
+window.refreshProjects = loadDynamicProjects;
+
+// Force check projects on window focus (when switching back to main site)
+window.addEventListener('focus', function() {
     loadDynamicProjects();
-    window.forceReload = false;
-};
+});
+
+// Add smooth reveal animation for sections
+const revealSections = document.querySelectorAll('section');
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+});
+
+revealSections.forEach(section => {
+    section.style.opacity = '0';
+    section.style.transform = 'translateY(50px)';
+    section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    revealObserver.observe(section);
+});
+
+// Add counter animation for stats (if you want to add stats section later)
+function animateCounter(element, target, duration = 2000) {
+    let start = 0;
+    const increment = target / (duration / 16);
+    
+    const timer = setInterval(() => {
+        start += increment;
+        element.textContent = Math.floor(start);
+        
+        if (start >= target) {
+            element.textContent = target;
+            clearInterval(timer);
+        }
+    }, 16);
+}
+
+// Initialize tooltips for service features
+document.querySelectorAll('.service-features li').forEach(item => {
+    item.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateX(5px)';
+        this.style.transition = 'transform 0.2s ease';
+    });
+    
+    item.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateX(0)';
+    });
+});
 
 console.log('EliteEdge website loaded successfully! 🚀');

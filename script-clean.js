@@ -333,30 +333,13 @@ function showNotification(message, type = 'info') {
 }
 
 // Load dynamic projects from Firebase or admin panel
-let isLoadingProjects = false;
-let projectsLoaded = false;
-
 async function loadDynamicProjects() {
-    // Prevent multiple simultaneous loads
-    if (isLoadingProjects) {
-        console.log('⏳ Projects already loading, skipping...');
-        return;
-    }
-    
-    // If projects are already loaded and we're not forcing a reload, skip
-    if (projectsLoaded && !window.forceReload) {
-        console.log('✅ Projects already loaded, skipping...');
-        return;
-    }
-    
-    isLoadingProjects = true;
     console.log('🔍 Starting loadDynamicProjects function');
     
     // Wait for DOM elements if they're not ready yet
     const projectsGrid = document.getElementById('projectsGrid');
     if (!projectsGrid) {
         console.log('⏳ DOM not ready yet, retrying in 100ms...');
-        isLoadingProjects = false;
         setTimeout(loadDynamicProjects, 100);
         return;
     }
@@ -435,10 +418,6 @@ async function loadDynamicProjects() {
                 </div>
             `;
         }
-        
-        // Mark loading as complete even when no projects
-        isLoadingProjects = false;
-        projectsLoaded = true;
         return;
     }
     
@@ -449,8 +428,7 @@ async function loadDynamicProjects() {
         console.log(`🎨 Processing project ${index + 1}:`, project.title);
         return `
         <div class="project-card" data-category="${project.category || 'WEB DEVELOPMENT'}">
-            <div class="project-image">
-                <img src="${project.image}" alt="${project.title}">
+            <div class="project-image" style="background-image: url('${project.image}');">
                 <div class="project-overlay">
                     <div class="project-links">
                         ${project.projectLink ? `<a href="${project.projectLink}" target="_blank" class="project-link" title="View Live"><i class="fas fa-external-link-alt"></i></a>` : ''}
@@ -459,7 +437,6 @@ async function loadDynamicProjects() {
                 </div>
             </div>
             <div class="project-content">
-                <div class="project-category">${project.category || 'WEB DEVELOPMENT'}</div>
                 <h3>${project.title}</h3>
                 <p>${project.description}</p>
                 <div class="project-tech">
@@ -505,19 +482,13 @@ async function loadDynamicProjects() {
     
     console.log('🎉 Project loading completed successfully!');
     
-    // Mark loading as complete
-    isLoadingProjects = false;
-    projectsLoaded = true;
-    
     // Set up real-time listener for future updates
     if (typeof FirebaseDB !== 'undefined' && !window.firebaseListenerSet) {
         console.log('🔥 Setting up Firebase real-time listener...');
         FirebaseDB.onProjectsUpdate((updatedProjects) => {
             console.log('🔄 Real-time update received:', updatedProjects.length, 'projects');
-            // Force reload projects when Firebase data changes
-            window.forceReload = true;
+            // Reload projects when Firebase data changes
             loadDynamicProjects();
-            window.forceReload = false;
         });
         window.firebaseListenerSet = true;
     }
@@ -525,30 +496,42 @@ async function loadDynamicProjects() {
 
 // Load projects on page load and DOM ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM Content Loaded - initiating single project load');
+    console.log('🚀 DOM Content Loaded - auto-loading projects');
     
-    // Single load attempt with small delay to ensure DOM is ready
+    // Run auto-load with delays
     setTimeout(() => {
-        console.log('📝 Loading projects...');
+        console.log('📝 Auto-load attempt (500ms delay)');
         loadDynamicProjects();
-    }, 300);
+    }, 500);
+    
+    setTimeout(() => {
+        console.log('📝 Backup attempt (1500ms delay)');
+        loadDynamicProjects();
+    }, 1500);
+    
+    setTimeout(() => {
+        console.log('📝 Final attempt (3000ms delay)');
+        loadDynamicProjects();
+    }, 3000);
+});
+
+// Also try when window is fully loaded
+window.addEventListener('load', function() {
+    console.log('🏁 Window fully loaded - auto-loading projects');
+    setTimeout(() => {
+        loadDynamicProjects();
+    }, 100);
 });
 
 // Listen for storage changes (when admin adds new projects)
 window.addEventListener('storage', function(e) {
-    if (e.key === 'website_projects' || e.key === 'eliteedge_projects') {
-        console.log('📦 Storage changed, reloading projects');
-        window.forceReload = true;
+    if (e.key === 'website_projects') {
+        console.log('Storage changed, reloading projects');
         loadDynamicProjects();
-        window.forceReload = false;
     }
 });
 
 // Manual refresh function (for testing)
-window.refreshProjects = () => {
-    window.forceReload = true;
-    loadDynamicProjects();
-    window.forceReload = false;
-};
+window.refreshProjects = loadDynamicProjects;
 
 console.log('EliteEdge website loaded successfully! 🚀');

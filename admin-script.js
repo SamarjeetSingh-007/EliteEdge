@@ -17,6 +17,17 @@ document.addEventListener('DOMContentLoaded', function() {
     projectForm = document.getElementById('projectForm');
     projectsList = document.getElementById('projectsList');
     
+    // Check Firebase connection
+    setTimeout(() => {
+        if (typeof FirebaseDB !== 'undefined') {
+            console.log('🔥 Firebase connected to admin panel!');
+            showNotification('Firebase connected! Projects will sync across all devices 🚀', 'success');
+        } else {
+            console.log('⚠️ Firebase not available, using localStorage only');
+            showNotification('Firebase not available - using local storage only', 'warning');
+        }
+    }, 1000);
+    
     // Show login modal on load
     loginModal.show();
     
@@ -24,8 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     
     // Load existing projects
-    loadProjects();
-    updateStats();
+    setTimeout(() => {
+        loadProjects();
+        updateStats();
+    }, 500);
 });
 
 function initializeEventListeners() {
@@ -200,7 +213,20 @@ function handleProjectSubmission(e) {
     testImg.src = imageUrl;
 }
 
-function saveProject(project) {
+async function saveProject(project) {
+    // Try to save to Firebase first
+    if (typeof FirebaseDB !== 'undefined') {
+        try {
+            console.log('🔥 Saving project to Firebase:', project.title);
+            await FirebaseDB.saveProject(project);
+            showNotification('Project saved to Firebase successfully! 🔥', 'success');
+        } catch (error) {
+            console.error('❌ Firebase save error:', error);
+            showNotification('Firebase error, saved locally instead', 'warning');
+        }
+    }
+    
+    // Also save to localStorage as backup
     let projects = getProjects();
     projects.unshift(project); // Add to beginning of array
     localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
@@ -214,8 +240,26 @@ function getProjects() {
     return projects ? JSON.parse(projects) : [];
 }
 
-function loadProjects() {
-    const projects = getProjects();
+async function loadProjects() {
+    let projects = [];
+    
+    // Try to load from Firebase first
+    if (typeof FirebaseDB !== 'undefined') {
+        try {
+            console.log('🔥 Loading projects from Firebase...');
+            projects = await FirebaseDB.loadProjects();
+            console.log('✅ Loaded', projects.length, 'projects from Firebase');
+        } catch (error) {
+            console.error('❌ Firebase load error:', error);
+            console.log('🔄 Falling back to localStorage...');
+        }
+    }
+    
+    // Fallback to localStorage if Firebase failed
+    if (projects.length === 0) {
+        projects = getProjects();
+        console.log('📦 Loaded', projects.length, 'projects from localStorage');
+    }
     
     if (projects.length === 0) {
         projectsList.innerHTML = `

@@ -287,10 +287,57 @@ body::before {
     position: relative;
 }
 
-.nav-link:hover,
-.nav-link.active {
-    background: rgba(99, 102, 241, 0.2) !important;
-    color: #fff !important;
+/* Desktop navigation with simple hover effects */
+@media (min-width: 769px) {
+    .nav-link {
+        padding: 0.75rem 1.5rem !important;
+        position: relative !important;
+        color: var(--text-secondary) !important;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        transition: all 0.3s ease !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+    }
+
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background: var(--gradient-primary);
+        border-radius: 1px;
+        transition: var(--transition);
+    }
+
+    .nav-link:hover {
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        background: transparent !important;
+        transform: none !important;
+    }
+
+    .nav-link:hover::after {
+        width: 80%;
+    }
+
+    /* Active link styling - no permanent underline but can show on hover */
+    .nav-link.active {
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        background: transparent !important;
+    }
+
+    .nav-link.active::after {
+        width: 0;
+    }
+
+    .nav-link.active:hover::after {
+        width: 80%;
+    }
 }
 
 /* Modern Hero Section */
@@ -924,7 +971,7 @@ section {
 
 .project-image {
     height: 200px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    background: rgba(255, 255, 255, 0.02);
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
@@ -1388,12 +1435,34 @@ section {
         background: rgba(17, 17, 34, 0.95);
         backdrop-filter: var(--blur);
         width: 100%;
-        text-align: center;
+        text-align: center !important;
         transition: var(--transition);
         box-shadow: var(--shadow-glass);
         padding: 3rem 0;
         border-top: 1px solid var(--border-glass);
         gap: 1rem;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Target Bootstrap navbar classes for mobile */
+    .navbar-nav {
+        flex-direction: column !important;
+        width: 100% !important;
+        text-align: center !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 2rem 0 !important;
+    }
+
+    .nav-item {
+        width: 100% !important;
+        text-align: center !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin-bottom: 1rem !important;
     }
 
     .nav-menu.active {
@@ -1401,9 +1470,75 @@ section {
     }
 
     .nav-menu a {
-        padding: 1rem 2rem;
-        border-radius: var(--border-radius);
-        margin: 0 2rem;
+        padding: 1rem 0 !important;
+        border-radius: 0 !important;
+        margin: 0 auto !important;
+        text-align: center !important;
+        display: flex !important;
+        width: 100% !important;
+        max-width: none !important;
+        font-weight: 500 !important;
+        font-size: 1.1rem !important;
+        color: var(--text-primary) !important;
+        border: none !important;
+        background: transparent !important;
+        transition: all 0.3s ease !important;
+        text-decoration: none !important;
+        position: relative !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    /* Also target .nav-link for Bootstrap compatibility */
+    .nav-link {
+        padding: 1rem 0 !important;
+        border-radius: 0 !important;
+        margin: 0 auto !important;
+        text-align: center !important;
+        display: flex !important;
+        width: 100% !important;
+        max-width: none !important;
+        font-weight: 500 !important;
+        font-size: 1.1rem !important;
+        color: var(--text-primary) !important;
+        border: none !important;
+        background: transparent !important;
+        transition: all 0.3s ease !important;
+        text-decoration: none !important;
+        position: relative !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    .nav-menu a::before {
+        display: none !important;
+    }
+
+    .nav-menu a::after {
+        display: none !important;
+    }
+
+    .nav-menu a:hover {
+        background: transparent !important;
+        color: var(--primary-color) !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Also apply to .nav-link for Bootstrap compatibility */
+    .nav-link::before {
+        display: none !important;
+    }
+
+    .nav-link::after {
+        display: none !important;
+    }
+
+    .nav-link:hover {
+        background: transparent !important;
+        color: var(--primary-color) !important;
+        transform: none !important;
+        box-shadow: none !important;
     }
 
     .hamburger {
@@ -1485,7 +1620,7 @@ section {
 
     .project-card {
         margin: 0 auto;
-        max-width: 400px;
+        max-width: 350px;
         height: auto !important;
         min-height: unset !important;
         overflow: visible !important;
@@ -1495,6 +1630,7 @@ section {
         border-radius: var(--border-radius);
         border: 1px solid rgba(255, 255, 255, 0.1);
         position: relative;
+        text-align: center; /* Center all text by default */
     }
 
     .project-image {
@@ -1505,26 +1641,35 @@ section {
     }
 
     .project-content {
-        padding: 1.5rem !important;
+        padding: 1.5rem 1.25rem !important;
         display: flex !important;
         flex-direction: column !important;
         flex-grow: 1;
         position: relative !important;
         overflow: visible !important;
+        text-align: center !important; /* Center content */
+        align-items: center !important; /* Center align items */
+    }
+
+    .project-category {
+        margin-bottom: 0.75rem !important;
+        align-self: center !important;
     }
 
     .project-content h3 {
-        font-size: 1.2rem !important;
+        font-size: 1.25rem !important;
         margin-bottom: 0.8rem !important;
         color: var(--text-primary);
         line-height: 1.3;
         display: block;
         width: 100%;
+        text-align: center !important;
+        font-weight: 700 !important;
     }
 
     .project-content p {
-        font-size: 0.85rem !important;
-        text-align: left !important;
+        font-size: 0.9rem !important;
+        text-align: center !important;
         margin-bottom: 1.2rem !important;
         color: var(--text-secondary);
         line-height: 1.5 !important;
@@ -1532,6 +1677,7 @@ section {
         overflow: visible !important;
         -webkit-line-clamp: unset !important;
         line-clamp: unset !important;
+        max-width: 100% !important;
     }
 
     .project-links {
@@ -1547,31 +1693,31 @@ section {
         font-size: 1rem;
     }
 
-    /* Fix tech tags to stay within card boundaries */
+    /* Fix tech tags to stay within card boundaries and center them */
     .project-tech {
         margin-top: auto !important;
         padding-top: 1rem !important;
         border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
         display: flex !important;
         flex-wrap: wrap !important;
-        gap: 0.3rem !important;
+        gap: 0.4rem !important;
         width: 100% !important;
         overflow: visible !important;
-        justify-content: flex-start !important;
+        justify-content: center !important; /* Center tech tags */
+        align-items: center !important;
     }
-    
+
     .tech-tag {
         font-size: 0.7rem !important;
-        padding: 0.25rem 0.5rem !important;
-        margin: 0 !important;
-        display: inline-block !important;
-        background: rgba(99, 102, 241, 0.15) !important;
-        border: 1px solid rgba(99, 102, 241, 0.3) !important;
+        padding: 0.4rem 0.8rem !important;
         border-radius: 12px !important;
-        color: var(--text-primary) !important;
+        background: rgba(99, 102, 241, 0.15) !important;
+        color: var(--primary-color) !important;
+        border: 1px solid rgba(99, 102, 241, 0.2) !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
         white-space: nowrap !important;
-        overflow: visible !important;
-        text-overflow: unset !important;
         flex-shrink: 0 !important;
     }
 
