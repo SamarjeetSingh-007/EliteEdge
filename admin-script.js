@@ -309,10 +309,22 @@ function deleteProject(projectId) {
         let projects = getProjects();
         projects = projects.filter(project => project.id !== projectId);
         localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
-        
+
+        // Delete from Firebase if available
+        if (typeof FirebaseDB !== 'undefined' && FirebaseDB.deleteProject) {
+            FirebaseDB.deleteProject(projectId)
+                .then(() => {
+                    showNotification('Project deleted from Firebase!', 'success');
+                })
+                .catch((error) => {
+                    console.error('❌ Firebase delete error:', error);
+                    showNotification('Failed to delete from Firebase, but removed locally.', 'warning');
+                });
+        }
+
         // Update main website
         updateMainWebsiteProjects(projects);
-        
+
         loadProjects();
         updateStats();
         showNotification('Project deleted successfully', 'info');
