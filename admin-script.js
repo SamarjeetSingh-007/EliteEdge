@@ -168,9 +168,9 @@ function handleProjectSubmission(e) {
     
     // Test if image loads
     const testImg = new Image();
-    testImg.onload = function() {
-        const project = {
-            id: Date.now().toString(),
+    testImg.onload = async function() {
+        // Prepare project data without id
+        const projectData = {
             title: title,
             category: category,
             description: description,
@@ -180,59 +180,61 @@ function handleProjectSubmission(e) {
             image: imageUrl,
             dateAdded: new Date().toISOString()
         };
-        
-        // Save project
-        saveProject(project);
-        
+
+        // Save project and get Firestore ID
+        let firestoreId = null;
+        if (typeof FirebaseDB !== 'undefined' && FirebaseDB.saveProject) {
+            try {
+                firestoreId = await FirebaseDB.saveProject(projectData);
+            } catch (error) {
+                showNotification('Firebase error, saved locally instead', 'warning');
+            }
+        }
+
+        // Use Firestore ID if available, else fallback to timestamp
+        const project = {
+            id: firestoreId || Date.now().toString(),
+            ...projectData
+        };
+
+        // Save to localStorage and update main website
+        let projects = getProjects();
+        projects.unshift(project);
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+        updateMainWebsiteProjects(projects);
+
         // Reset form
         projectForm.reset();
         document.getElementById('imagePreview').innerHTML = '';
-        
+
         // Reload projects list
-        loadProjects();
+        await loadProjects();
         updateStats();
-        
+
         showLoading(false);
         showNotification('Project added successfully! 🎉', 'success');
-        
+
         // Clear form draft
         clearFormDraft();
-        
+
         // Scroll to projects list
         document.getElementById('projectsList').scrollIntoView({ 
             behavior: 'smooth',
             block: 'start'
         });
     };
-    
+
     testImg.onerror = function() {
         showLoading(false);
         showNotification('Failed to load the image. Please check the URL and try again.', 'error');
     };
-    
+
     testImg.src = imageUrl;
 }
 
 async function saveProject(project) {
-    // Try to save to Firebase first
-    if (typeof FirebaseDB !== 'undefined') {
-        try {
-            console.log('🔥 Saving project to Firebase:', project.title);
-            await FirebaseDB.saveProject(project);
-            showNotification('Project saved to Firebase successfully! 🔥', 'success');
-        } catch (error) {
-            console.error('❌ Firebase save error:', error);
-            showNotification('Firebase error, saved locally instead', 'warning');
-        }
-    }
-    
-    // Also save to localStorage as backup
-    let projects = getProjects();
-    projects.unshift(project); // Add to beginning of array
-    localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
-    
-    // Also update the main website's projects data
-    updateMainWebsiteProjects(projects);
+    // Deprecated: now handled in handleProjectSubmission to ensure Firestore ID is used
+    return;
 }
 
 function getProjects() {
@@ -304,28 +306,36 @@ async function loadProjects() {
     `).join('');
 }
 
-function deleteProject(projectId) {
+async function deleteProject(projectId) {
     if (confirm('Are you sure you want to delete this project?')) {
+        // Delete from Firebase if available and wait for completion
+        let firebaseDeleted = false;
+        if (typeof FirebaseDB !== 'undefined' && FirebaseDB.deleteProject) {
+            try {
+                await FirebaseDB.deleteProject(projectId);
+                showNotification('Project deleted from Firebase!', 'success');
+                firebaseDeleted = true;
+            } catch (error) {
+                console.error('❌ Firebase delete error:', error);
+                showNotification('Failed to delete from Firebase, but removed locally.', 'warning');
+            }
+        }
+
+        // Always remove from localStorage as backup
         let projects = getProjects();
         projects = projects.filter(project => project.id !== projectId);
         localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
 
-        // Delete from Firebase if available
-        if (typeof FirebaseDB !== 'undefined' && FirebaseDB.deleteProject) {
-            FirebaseDB.deleteProject(projectId)
-                .then(() => {
-                    showNotification('Project deleted from Firebase!', 'success');
-                })
-                .catch((error) => {
-                    console.error('❌ Firebase delete error:', error);
-                    showNotification('Failed to delete from Firebase, but removed locally.', 'warning');
-                });
+        // If Firebase was used, reload from Firebase to ensure sync
+        if (firebaseDeleted) {
+            await loadProjects();
+            projects = getProjects(); // get updated list after reload
+        } else {
+            loadProjects();
         }
 
         // Update main website
         updateMainWebsiteProjects(projects);
-
-        loadProjects();
         updateStats();
         showNotification('Project deleted successfully', 'info');
     }
